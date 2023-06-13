@@ -2,7 +2,7 @@ import Parity.ODD
 
 import java.awt.Color
 enum Parity:
-  case ODD ,EVEN
+  case EVEN, ODD
 class Color(val RGB: Int) {
   def this(red: Int, green: Int, blue: Int) = {
     this((red * 65536) + (green * 256) + blue)
@@ -21,8 +21,8 @@ class Color(val RGB: Int) {
   def &(mask: Int): Color = new Color(((red & mask) * 65536) + ((green & mask) * 256) + (blue & mask))
 
   def set_last_bits(r: Parity, g: Parity, b: Parity) =
-    new Color(if (r == ODD) red | 1 else red & 0xfffffffe,
-      if (g == ODD) green | 1 else green & 0xfffffffe,
-      if (b == ODD) blue | 1 else blue & 0xfffffffe)
+    new Color(if (r == ODD) (red | 1) else (red & 0xfffffffe),
+      if (g == ODD) (green | 1) else (green & 0xfffffffe),
+      if (b == ODD) (blue | 1) else (blue & 0xfffffffe))
 }
 

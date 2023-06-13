@@ -6,19 +6,104 @@ import java.awt.image.BufferedImage
 val FILE_WITH_SECRET_FILE_NAME: String = "zwykly_obrazek"
 val SECRET_FILE_NAME: String = "sekret"
 val DEFAULT_OUTPUT_FILE_EXTENSION: String = "png"
-@main
-def main(a: String*): Unit = {
-  val args = a.toArray
-  val baseFileName :String = args(0)
-  val secretFileName :String = args(1)
+val PRODUCTION = true
 
-  val photo1 = ImageIO.read(new File(baseFileName))
-  val photo2 = ImageIO.read(new File(secretFileName))
+@main
+def main(command: String, a: String*): Unit = {
+  command match
+    case "help" => showHelp()
+    case "hide" =>
+      try {
+        val args = a.toArray
+        val baseFilePath: String = args(0)
+        val secretFilePath: String = args(1)
+        val outputFilePath: String = args(2)
+        hideImage( baseFilePath, secretFilePath, outputFilePath)
+      } catch {
+        case ex: ArrayIndexOutOfBoundsException =>
+          // Exception handling code
+          println("Caught an ArrayIndexOutOfBoundsException!")
+          if(PRODUCTION) ex.printStackTrace()
+      }
+
+    case "hide_text" =>
+      try {
+        val args = a.toArray
+        val baseFilePath: String = args(0)
+        val outputFilePath: String = args(2)
+        val secretText: String = args(1)
+        hideText( baseFilePath, outputFilePath, secretText)
+      } catch {
+        case ex: ArrayIndexOutOfBoundsException =>
+          // Exception handling code
+          println("Caught an ArrayIndexOutOfBoundsException!")
+          if (PRODUCTION) ex.printStackTrace()
+      }
+
+    case "show_text" =>
+      try {
+        val args = a.toArray
+        val secretFilePath: String = args(0)
+        showText(secretFilePath)
+      } catch {
+        case ex: ArrayIndexOutOfBoundsException =>
+          // Exception handling code
+          println("Caught an ArrayIndexOutOfBoundsException!")
+          if (PRODUCTION) ex.printStackTrace()
+      }
+
+    case "show" =>
+      try {
+        val args = a.toArray
+        val secretFilePath: String = args(0)
+        val outputFilePath: String = args(1)
+        showImage(secretFilePath, outputFilePath)
+      } catch {
+        case ex: ArrayIndexOutOfBoundsException =>
+          // Exception handling code
+          println("Caught an ArrayIndexOutOfBoundsException!")
+          if(PRODUCTION) ex.printStackTrace()
+      }
+
+    case _ =>
+      println("Invalid Command")
+
+
+}
+
+def hideImage(baseFilePath :String, secretFilePath :String, outputFilePath: String): Unit = {
+  val photo1 = ImageIO.read(new File(baseFilePath))
+  val photo2 = ImageIO.read(new File(secretFilePath))
   val photo3 = HideImage.hide(photo1, photo2)
 
-  ImageIO.write(photo3, DEFAULT_OUTPUT_FILE_EXTENSION, new File(FILE_WITH_SECRET_FILE_NAME+"."+DEFAULT_OUTPUT_FILE_EXTENSION))
+  ImageIO.write(photo3, DEFAULT_OUTPUT_FILE_EXTENSION, new File( outputFilePath))
+}
+def hideText(baseFilePath :String, outputFilePath: String, secretText: String): Unit = {
+  val photo1 = ImageIO.read(new File(baseFilePath))
+  val photo3 = HideText.hide(photo1, secretText)
 
-  val photo4 = HideImage.reveal(ImageIO.read(new File(FILE_WITH_SECRET_FILE_NAME+"."+DEFAULT_OUTPUT_FILE_EXTENSION)))
+  ImageIO.write(photo3, DEFAULT_OUTPUT_FILE_EXTENSION, new File( outputFilePath))
+}
 
-  ImageIO.write(photo4, DEFAULT_OUTPUT_FILE_EXTENSION, new File(SECRET_FILE_NAME+"."+DEFAULT_OUTPUT_FILE_EXTENSION))
+def showText(secretFilePath :String): Unit = {
+  val photo1 = ImageIO.read(new File(secretFilePath))
+  val text = HideText.reveal(photo1)
+  println(text)
+}
+
+def showImage(secretFilePath :String, outputFilePath: String): Unit = {
+  val photo4 = HideImage.reveal(ImageIO.read(new File(secretFilePath)))
+
+  ImageIO.write(photo4, DEFAULT_OUTPUT_FILE_EXTENSION, new File(outputFilePath))
+}
+
+def showHelp(): Unit = {
+  println("Available Commands:\n" +
+    "- hide : Hides one image into another.\n" +
+    "  Usage: hide <source_image_path> <hidden_image_path> <output_image_path>\n" +
+    "  Example: hide image1.jpg image2.png output.jpg\n\n" +
+    "- show : Retrieves the hidden image from an image.\n" +
+    "  Usage: show <image_path> <secret_img_path>\n" +
+    "  Example: show steganography_image.jpg hidden.jpg")
+
 }
