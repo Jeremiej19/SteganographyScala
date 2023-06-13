@@ -17,7 +17,7 @@ object HideText {
     val h = imgBase.getHeight
     val textLength = textSecret.length
 
-    if(textLength*3 > w*h){
+    if (textLength * 3 > w * h) {
       println("Text is too long to hide it in this image !!")
       sys.exit(1)
     }
@@ -31,21 +31,21 @@ object HideText {
     for (x <- 0 until w)
       for (y <- 0 until h) {
         val colorBase = Color(imgBase.getRGB(x, y))
-        if(currCharIndex < textLength) {
-          val r = Parity.fromOrdinal(currCharValue%2)
-          val g = Parity.fromOrdinal((currCharValue>>1)%2)
-          var b = Parity.fromOrdinal((currCharValue>>2)%2)
-          currCharValue  = currCharValue >> 3
+        if (currCharIndex < textLength) {
+          val r = Parity.fromOrdinal(currCharValue % 2)
+          val g = Parity.fromOrdinal((currCharValue >> 1) % 2)
+          var b = Parity.fromOrdinal((currCharValue >> 2) % 2)
+          currCharValue = currCharValue >> 3
           step = step + 1
-          if(step == 3) {
-            b = if(textLength > 0) EVEN else ODD
+          println(s"textSecret(currCharIndex) = ${textSecret(currCharIndex)}")
+          if (step == 3) {
             currCharIndex = currCharIndex + 1
-            if(currCharIndex < textLength) currCharValue = textSecret(currCharIndex).toInt
+            b = if (currCharIndex >= textLength) ODD else EVEN
+            if (currCharIndex < textLength) currCharValue = textSecret(currCharIndex).toInt
             step = 0
           }
-
-          out.setRGB(x, y, colorBase.set_last_bits(r,g,b).RGB)
-        }else
+          out.setRGB(x, y, colorBase.set_last_bits(r, g, b).RGB)
+        } else
           out.setRGB(x, y, colorBase.RGB)
       }
 
@@ -66,14 +66,15 @@ object HideText {
     var x = 0
     var y = 0
     while ((x < w) && (y < h) && running) {
+
       val colorBase = Color(imgWithText.getRGB(x, y))
       charValue = charValue + (colorBase.red % 2) * increment
-      increment = increment * 2
+      increment = increment << 1
       charValue = charValue + (colorBase.green % 2) * increment
-      increment = increment * 2
+      increment = increment << 1
       if (pixelCount != 2) {
         charValue = charValue + (colorBase.blue % 2) * increment
-        increment = increment * 2
+        increment = increment << 1
         pixelCount = pixelCount + 1
       } else {
         pixelCount = 0
@@ -82,7 +83,6 @@ object HideText {
         increment = 1
         if (colorBase.blue % 2 == 1) running = false;
       }
-
       y = y + 1
       if (y >= w) {
         y = 0
@@ -90,26 +90,6 @@ object HideText {
       }
     }
 
-//    for (x <- 0 until w)
-//      for (y <- 0 until h) {
-//        val colorBase = Color(imgWithText.getRGB(x, y))
-//        charValue = charValue + (colorBase.red % 2) * increment
-//        increment = increment * 2
-//        charValue = charValue + (colorBase.green % 2) * increment
-//        increment = increment * 2
-//        if (pixelCount != 2) {
-//          charValue = charValue + (colorBase.blue % 2) * increment
-//          increment = increment * 2
-//          pixelCount = pixelCount + 1
-//        } else {
-//          pixelCount = 0
-//          println(charValue)
-//          out = out + charValue.toChar
-//          charValue = 0
-//          increment = 1
-//          if (colorBase.blue % 2 == 1) return out
-//        }
-//      }
     out
   }
 }

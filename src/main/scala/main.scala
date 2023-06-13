@@ -11,7 +11,6 @@ val PRODUCTION = true
 @main
 def main(command: String, a: String*): Unit = {
   command match
-    case "help" => showHelp()
     case "hide" =>
       try {
         val args = a.toArray
@@ -65,9 +64,7 @@ def main(command: String, a: String*): Unit = {
           if(PRODUCTION) ex.printStackTrace()
       }
 
-    case _ =>
-      println("Invalid Command")
-
+    case _ => showHelp()
 
 }
 
@@ -103,7 +100,13 @@ def showHelp(): Unit = {
     "  Usage: hide <source_image_path> <hidden_image_path> <output_image_path>\n" +
     "  Example: hide image1.jpg image2.png output.jpg\n\n" +
     "- show : Retrieves the hidden image from an image.\n" +
-    "  Usage: show <image_path> <secret_img_path>\n" +
-    "  Example: show steganography_image.jpg hidden.jpg")
+    "  Usage: show <image_with_hidden_message_path> <output_img_path>\n" +
+    "  Example: show steganography_image.jpg hidden.jpg\n\n" +
+    "- hide_text : Hides text in an image.\n" +
+    "  Usage: hide_text <source_image_path> <text> <output_image_path>\n" +
+    "  Example: hide_text image.jpg \"Secret message\" output.jpg\n\n" +
+    "- show_text : Retrieves the hidden text from an image.\n" +
+    "  Usage: show_text <image_path>\n" +
+    "  Example: show_text steganography_image.jpg")
 
 }
