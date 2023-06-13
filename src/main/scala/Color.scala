@@ -13,11 +13,8 @@ class Color(val RGB: Int) {
   val blue: Int = (RGB & 0xff)
 
   def >>(shift: Int): Color = new Color(((red >> shift) * 65536) + ((green >> shift) * 256) + (blue >> shift))
-
   def <<(shift: Int): Color = new Color(((red << shift) * 65536) + ((green << shift) * 256) + (blue << shift))
-
   def +(other: Color): Color = new Color(((red + other.red) * 65536) + ((green + other.green) * 256) + (blue + other.blue))
-
   def &(mask: Int): Color = new Color(((red & mask) * 65536) + ((green & mask) * 256) + (blue & mask))
 
   def set_last_bits(r: Parity, g: Parity, b: Parity) =

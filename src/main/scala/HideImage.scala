@@ -4,7 +4,7 @@ object HideImage {
   import javax.imageio.ImageIO
   import java.awt.image.BufferedImage
 
-  private val SECRET_LENGTH = 3
+  private val SECRET_LENGTH = 2
   private val BASE_LENGTH: Int = 8 - SECRET_LENGTH
   private val SECRET_MASK: Int = (1 << SECRET_LENGTH) - 1
   val FILE_WITH_SECRET_FILE_NAME: String = "zwykly_obrazek"

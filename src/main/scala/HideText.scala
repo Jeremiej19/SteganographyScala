@@ -37,7 +37,7 @@ object HideText {
           var b = Parity.fromOrdinal((currCharValue >> 2) % 2)
           currCharValue = currCharValue >> 3
           step = step + 1
-          println(s"textSecret(currCharIndex) = ${textSecret(currCharIndex)}")
+//          println(s"textSecret(currCharIndex) = ${textSecret(currCharIndex)}")
           if (step == 3) {
             currCharIndex = currCharIndex + 1
             b = if (currCharIndex >= textLength) ODD else EVEN
@@ -84,7 +84,7 @@ object HideText {
         if (colorBase.blue % 2 == 1) running = false;
       }
       y = y + 1
-      if (y >= w) {
+      if (y >= h) {
         y = 0
         x = x + 1
       }
