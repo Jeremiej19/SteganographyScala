@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage
 val SECRET_LENGTH = 2
 val BASE_LENGTH: Int = 8 - SECRET_LENGTH
 val SECRET_MASK: Int = (1 << SECRET_LENGTH) - 1
-val FILE_WITH_SECRET_FILE_NAME: String = "zwykly_obrazek"
+val FILE_WITH_SECRET_FILE_NAME: String = "zwykly_obrazeks"
 val SECRET_FILE_NAME: String = "sekret"
 val DEFAULT_OUTPUT_FILE_EXTENSION: String = "png"
 
