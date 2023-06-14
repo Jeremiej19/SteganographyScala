@@ -4,6 +4,10 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 
 @main
-def main(command: String, a: String*): Unit = {
-  ArgumentParser.parse(command, a*);
+def main(a: String*): Unit = {
+  val args = a.toArray
+  if (args.length == 0)
+    ArgumentParser.parse("help", args.slice(1 , args.length)*)
+  else
+    ArgumentParser.parse(args(0), args.slice(1 , args.length)*)
 }
