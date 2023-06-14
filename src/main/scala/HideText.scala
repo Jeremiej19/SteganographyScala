@@ -7,6 +7,7 @@ object HideText {
   import java.io.File
   import javax.imageio.ImageIO
   import java.awt.image.BufferedImage
+  import scala.util.control.Breaks._
 
   val FILE_WITH_SECRET_FILE_NAME: String = "zwykly_obrazek"
   val SECRET_FILE_NAME: String = "sekret"
@@ -26,23 +27,27 @@ object HideText {
 
     var currCharIndex = 0
     var currCharValue = textSecret(0).toInt
-    var step = 0
+    // Every ascii character is represented by last bits of 3 pixels
+    var currPixelNumber = 0
 
     for (x <- 0 until w)
       for (y <- 0 until h) {
         val colorBase = Color(imgBase.getRGB(x, y))
         if (currCharIndex < textLength) {
           val r = Parity.fromOrdinal(currCharValue % 2)
-          val g = Parity.fromOrdinal((currCharValue >> 1) % 2)
-          var b = Parity.fromOrdinal((currCharValue >> 2) % 2)
-          currCharValue = currCharValue >> 3
-          step = step + 1
-//          println(s"textSecret(currCharIndex) = ${textSecret(currCharIndex)}")
-          if (step == 3) {
+          currCharValue = currCharValue >> 1
+          val g = Parity.fromOrdinal(currCharValue % 2)
+          currCharValue = currCharValue >> 1
+          var b = Parity.fromOrdinal(currCharValue % 2)
+          currCharValue = currCharValue >> 1
+
+          currPixelNumber = currPixelNumber + 1
+          if (currPixelNumber == 3) {
             currCharIndex = currCharIndex + 1
+            //Check if it is the end of message set last bit of 3 pixel sequence to 1
             b = if (currCharIndex >= textLength) ODD else EVEN
             if (currCharIndex < textLength) currCharValue = textSecret(currCharIndex).toInt
-            step = 0
+            currPixelNumber = 0
           }
           out.setRGB(x, y, colorBase.set_last_bits(r, g, b).RGB)
         } else
@@ -58,36 +63,31 @@ object HideText {
     val h = imgWithText.getHeight
 
     var out = ""
-    var charValue = 0;
-    var pixelCount = 0;
+    var charValue = 0
+    // Every ascii character is represented by last bits of 3 pixels
+    var currPixelNumber = 0
     var increment = 1
-    var running = true;
 
-    var x = 0
-    var y = 0
-    while ((x < w) && (y < h) && running) {
-
-      val colorBase = Color(imgWithText.getRGB(x, y))
-      charValue = charValue + (colorBase.red % 2) * increment
-      increment = increment << 1
-      charValue = charValue + (colorBase.green % 2) * increment
-      increment = increment << 1
-      if (pixelCount != 2) {
-        charValue = charValue + (colorBase.blue % 2) * increment
-        increment = increment << 1
-        pixelCount = pixelCount + 1
-      } else {
-        pixelCount = 0
-        out = out + charValue.toChar
-        charValue = 0
-        increment = 1
-        if (colorBase.blue % 2 == 1) running = false;
-      }
-      y = y + 1
-      if (y >= h) {
-        y = 0
-        x = x + 1
-      }
+    breakable{
+      for (x <- 0 until w)
+        for (y <- 0 until h) {
+          currPixelNumber = currPixelNumber + 1
+          val colorBase = Color(imgWithText.getRGB(x, y))
+          charValue = charValue + (colorBase.red % 2) * increment
+          increment = increment << 1
+          charValue = charValue + (colorBase.green % 2) * increment
+          increment = increment << 1
+          if (currPixelNumber != 3) {
+            charValue = charValue + (colorBase.blue % 2) * increment
+            increment = increment << 1
+          } else {
+            currPixelNumber = 0
+            out = out + charValue.toChar
+            charValue = 0
+            increment = 1
+            if (colorBase.blue % 2 == 1) break
+          }
+        }
     }
 
     out
